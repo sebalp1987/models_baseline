@@ -56,7 +56,7 @@ print(model.summary())
 model.compile(optimizer=tf.keras.optimizers.Adam(),
               loss='sparse_categorical_crossentropy',
               metrics=[tf.metrics.SparseCategoricalAccuracy(name='acc'),
-                       tf.metrics.SparseTopKCategoricalAccuracy(k=5, name='top5_acc')])
+                       tf.metrics.SparseTopKCategoricalAccuracy(k=2, name='top5_acc')])
 
 # Usamos el callback que creamos
 metrics_to_print = collections.OrderedDict([('loss', 'loss'), ('v-loss', 'val_loss'),
@@ -74,4 +74,4 @@ callbacks = [tf.keras.callbacks.EarlyStopping(patience=8, monitor='val_acc',
 history = model.fit(train_generator, epochs=num_epochs, steps_per_epoch=math.ceil(num_train_img / batch_image),
                     validation_data=test_generator, validation_steps=math.ceil(num_test_img / batch_image),
                     verbose=1, callbacks=callbacks)
-tf.keras.models.save_model(model, filepath='', overwrite=True, save_format='h5')
+model.save('model.h5')

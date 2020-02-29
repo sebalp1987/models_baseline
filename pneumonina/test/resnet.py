@@ -108,7 +108,6 @@ ax[1, 1].plot(history.history['val_acc'])
 ax[2, 0].plot(history.history['top5_acc'])
 ax[2, 1].plot(history.history['val_top5_acc'])
 
-plt.show()
 plt.savefig('performance.png')
 
 best_val_acc = max(history.history['val_acc']) * 100
