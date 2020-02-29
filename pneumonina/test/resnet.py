@@ -13,6 +13,7 @@ valid = os.path.join(STRING.data_input_path, STRING.data_input_path, 'val')
 
 batch_image = config.global_params.get('batch_image')
 num_epochs = config.model_params.get('num_epochs')
+input_shape = config.global_params.get('input_shape')
 num_train_img = len([name for name in os.listdir(STRING.data_input_path + 'train/NORMAL')]) \
                 + len([name for name in os.listdir(STRING.data_input_path + 'train/PNEUMONIA')])
 num_test_img = len([name for name in os.listdir(STRING.data_input_path + 'test/NORMAL')]) \
@@ -33,13 +34,13 @@ train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
 test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(train,
-                                                    target_size=(224, 224),
+                                                    target_size=(input_shape[0], input_shape[1]),
                                                     batch_size=batch_image,
                                                     class_mode='binary',
                                                     color_mode='grayscale')
 test_generator = test_datagen.flow_from_directory(
     test,
-    target_size=(224, 224),
+    target_size=(input_shape[0], input_shape[1]),
     batch_size=batch_image,
     class_mode='binary',
     color_mode='grayscale'
@@ -49,22 +50,23 @@ test_generator = test_datagen.flow_from_directory(
 batch_x, batch_y = train_generator.next()
 print(batch_x.shape)
 
-# MODEL
+# MODEL: Using pretrained Parameters
 '''
 conv = tf.keras.applications.ResNet50(
     include_top=False,
-    input_shape=(224, 224, 1),
-    weights=None
+    input_shape=(input_shape[0], input_shape[1], input_shape[2]),
+    weights='imagenet'
 )
 print(conv.summary())
 
 model = tf.keras.models.Sequential()
 model.add(conv)
 model.add(tf.keras.layers.GlobalAveragePooling2D(name='avg_poll'))
-model.add(tf.keras.layers.Dense(units=2, activation='softmax', kernel_initializer='he_normal'))
+model.add(tf.keras.layers.Dropout(0.5))
+model.add(tf.keras.layers.Dense(units=2, activation='sigmoid', kernel_initializer='he_normal'))
 print(model.summary())
 '''
-model = resnet.ResNet50(input_shape=config.global_params.get('input_shape'), num_classes=2)
+model = resnet.ResNet50(input_shape=input_shape, num_classes=2)
 print(model.summary())
 
 model.compile(optimizer=tf.keras.optimizers.Adam(),
@@ -107,6 +109,7 @@ ax[2, 0].plot(history.history['top5_acc'])
 ax[2, 1].plot(history.history['val_top5_acc'])
 
 plt.show()
+plt.savefig('performance.png')
 
 best_val_acc = max(history.history['val_acc']) * 100
 best_val_top5 = max(history.history['val_top5_acc']) * 100

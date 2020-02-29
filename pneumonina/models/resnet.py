@@ -225,7 +225,8 @@ class ResNet(tf.keras.Sequential):
             # Final Layer
             [
                 tf.keras.layers.GlobalAveragePooling2D(name='avg_poll'),
-                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.Dense(512, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Dense(units=num_classes, activation='softmax', kernel_initializer=kernel_initializer)
             ], name=name
 
