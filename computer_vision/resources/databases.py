@@ -36,3 +36,4 @@ def get_mnist_dataset(phase='train', target='label', batch_size=32, num_epochs=N
     mnist_dataset = mnist_dataset.prefetch(1)
 
     return mnist_dataset
+
